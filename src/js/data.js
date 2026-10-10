@@ -32,8 +32,8 @@ const APPS = {
     id: 'transformice', name: 'Transformice', publisher: 'Atelier 801', genre: 'Çok Oyunculu Platform', size: 'Çevrimiçi',
     colors: ['#8fd3ff', '#2a5aa8'], glyph: 'mouse', preinstalled: true,
     web: 'https://www.transformice.com/',
-    desc: 'Fare ol, peyniri kap ve yuvaya ilk sen ulaş! Şaman fareler köprüler kurarken diğer oyuncularla birlikte haritaları geç. Gerçek çevrimiçi oyun, ayrı bir pencerede açılır.',
-    controls: 'Oyunun kendi kontrolleri (klavye ve fare). İnternet bağlantısı gerekir.',
+    desc: 'Fare ol, peyniri kap ve yuvaya ilk sen ulaş! Şaman fareler köprüler kurarken diğer oyuncularla birlikte haritaları geç. Gerçek çevrimiçi oyun, emülatörün içinde açılır.',
+    controls: 'Oyunun kendi kontrolleri (klavye ve fare)  ·  Home: Ana ekran  ·  İnternet gerekir',
     trophies: []
   },
   asteroids: {

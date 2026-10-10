@@ -249,3 +249,14 @@ table.ctrl td:nth-child(2) { opacity: .7; width: 300px; }
 #rest .pw-msg { font-size: 28px; text-align: center; line-height: 1.6; color: #ddd; display: flex; flex-direction: column; align-items: center; gap: 24px; }
 #rest .pw-msg small { font-size: 18px; opacity: .6; }
 #rest .pw-msg.dim { color: #888; }
+
+/* ---------- Gömülü çevrimiçi oyun ---------- */
+#web-layer { position: fixed; inset: 0; z-index: 500; background: #000; visibility: hidden; }
+#web-layer.on { visibility: visible; }
+#web-layer webview { position: absolute; inset: 0; width: 100%; height: 100%; }
+#web-layer .web-error { position: absolute; inset: 0; background: #05070d; display: flex; align-items: center; justify-content: center; text-align: center; }
+#web-layer .we-box h2 { font-size: 30px; font-weight: 400; margin-bottom: 14px; }
+#web-layer .we-box p { font-size: 20px; opacity: .75; line-height: 1.5; margin-bottom: 30px; }
+#web-layer .we-box small { font-size: 15px; opacity: .6; }
+#web-layer .hints { position: static; justify-content: center; font-size: 18px; gap: 30px; }
+#web-layer .g { width: 32px; height: 32px; } #web-layer .g svg { width: 24px; height: 24px; }

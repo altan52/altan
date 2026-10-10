@@ -4,52 +4,14 @@ const path = require('path');
 
 const startFullscreen = process.argv.includes('--fullscreen');
 
-// Kütüphanedeki çevrimiçi oyunlar: yalnızca bu adresler açılabilir
-const WEB_APPS = {
-  transformice: { title: 'Transformice', url: 'https://www.transformice.com/' }
-};
-const webWindows = {};
-
-function openWebApp(id) {
-  const entry = WEB_APPS[id];
-  if (!entry) return;
-  const existing = webWindows[id];
-  if (existing && !existing.isDestroyed()) {
-    if (existing.isMinimized()) existing.restore();
-    existing.focus();
-    return;
+// Emülatörün içine gömülebilecek çevrimiçi oyunlar (yalnızca bu alan adları)
+function isAllowedWebUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.protocol === 'https:' && /(^|\.)transformice\.com$/i.test(url.hostname);
+  } catch (e) {
+    return false;
   }
-  const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 800,
-    minHeight: 500,
-    title: entry.title,
-    backgroundColor: '#000000',
-    icon: path.join(__dirname, 'build', 'icon.png'),
-    autoHideMenuBar: true,
-    webPreferences: {
-      partition: 'persist:' + id, // oturum (giriş bilgisi) kalıcı olsun
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true
-    }
-  });
-  win.setMenu(null);
-  win.loadURL(entry.url);
-  // Açılır pencereleri (forum, wiki vb.) varsayılan tarayıcıda aç
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
-    return { action: 'deny' };
-  });
-  win.webContents.on('before-input-event', (event, input) => {
-    if (input.type === 'keyDown' && input.key === 'F11') {
-      win.setFullScreen(!win.isFullScreen());
-      event.preventDefault();
-    }
-  });
-  win.on('closed', () => { delete webWindows[id]; });
-  webWindows[id] = win;
 }
 
 function createWindow() {
@@ -70,6 +32,7 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       autoplayPolicy: 'no-user-gesture-required',
+      webviewTag: true,
       backgroundThrottling: false
     }
   });
@@ -84,6 +47,10 @@ function createWindow() {
     if (input.key === 'F11') {
       win.setFullScreen(!win.isFullScreen());
       event.preventDefault();
+    } else if (input.key === 'Home') {
+      // PS tuşu: gömülü oyun klavyeyi tutsa bile her zaman ana ekrana döner
+      event.preventDefault();
+      win.webContents.send('webapp:home');
     } else if (input.key === 'F12') {
       win.webContents.toggleDevTools();
       event.preventDefault();
@@ -92,10 +59,36 @@ function createWindow() {
 
   // Uygulama içinden dış bağlantı açılmasını engelle
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+
+  // Gömülü oyun görünümü: güvenli ayarlar ve izinli adres kontrolü
+  win.webContents.on('will-attach-webview', (event, webPreferences, params) => {
+    delete webPreferences.preload;
+    webPreferences.nodeIntegration = false;
+    webPreferences.contextIsolation = true;
+    webPreferences.sandbox = true;
+    if (!isAllowedWebUrl(params.src)) event.preventDefault();
+  });
+  win.webContents.on('did-attach-webview', (event, guest) => {
+    // Oyundaki açılır bağlantılar (forum, wiki vb.) varsayılan tarayıcıda açılsın
+    guest.setWindowOpenHandler(({ url }) => {
+      if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+      return { action: 'deny' };
+    });
+    // Oyun klavyeyi tutarken Home = PS tuşu (ana ekrana dön), F11 = tam ekran
+    guest.on('before-input-event', (e, input) => {
+      if (input.type !== 'keyDown') return;
+      if (input.key === 'Home') {
+        e.preventDefault();
+        win.webContents.send('webapp:home');
+      } else if (input.key === 'F11') {
+        e.preventDefault();
+        win.setFullScreen(!win.isFullScreen());
+      }
+    });
+  });
 }
 
 ipcMain.on('app:quit', () => app.quit());
-ipcMain.on('app:open-web', (e, id) => openWebApp(String(id)));
 ipcMain.on('app:fullscreen', (e) => {
   const win = BrowserWindow.fromWebContents(e.sender);
   if (win) win.setFullScreen(!win.isFullScreen());

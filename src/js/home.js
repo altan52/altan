@@ -122,6 +122,13 @@ class HomeScreen extends Screen {
     this.layout();
   }
 
+  select(key) {
+    const i = this.list.findIndex(x => x.key === key);
+    if (i < 0) return;
+    this.sel = i; this.zone = 'content';
+    this.layout();
+  }
+
   refreshBadges() {
     const unreadN = Save.data.notifications.filter(n => !n.read).length;
     const unreadM = MESSAGES.filter(m => !Save.data.msgRead.includes(m.id)).length;

@@ -496,6 +496,49 @@ class PongGame {
   }
 }
 
+/* ================= ÇEVRİMİÇİ OYUN (emülatör içinde gömülü) ================= */
+class WebApp {
+  constructor(id) {
+    this.id = id;
+    this.web = true;
+    this.failed = false;
+    this.box = $('#web-layer');
+    this.box.innerHTML = '';
+    const wv = document.createElement('webview');
+    wv.setAttribute('partition', 'persist:' + id); // giriş bilgisi kalıcı olsun
+    wv.setAttribute('allowpopups', '');
+    wv.setAttribute('src', APPS[id].web);
+    wv.addEventListener('did-fail-load', e => {
+      if (e.isMainFrame && e.errorCode !== -3) this.showError(e.errorDescription || 'Bağlantı hatası');
+    });
+    this.wv = wv;
+    this.err = el('div', 'web-error hidden');
+    this.box.appendChild(wv);
+    this.box.appendChild(this.err);
+  }
+  showError(msg) {
+    this.failed = true;
+    this.err.innerHTML =
+      `<div class="we-box"><h2>${esc(APPS[this.id].name)} sunucusuna bağlanılamadı</h2>` +
+      `<p>İnternet bağlantınızı kontrol edin.<br><small>${esc(msg)}</small></p>` +
+      `<div class="hints">${hintsHTML([['x', 'Tekrar Dene'], ['ps', 'Ana Ekran (Home)']])}</div></div>`;
+    this.err.classList.remove('hidden');
+    if (document.activeElement === this.wv) this.wv.blur();
+  }
+  retry() {
+    this.failed = false;
+    this.err.classList.add('hidden');
+    this.wv.reload();
+    this.focus();
+  }
+  focus() { if (!this.failed) this.wv.focus(); }
+  reset() { this.retry(); }
+  input(a) { if (this.failed && a === 'x') { Sound.select(); this.retry(); } }
+  update() {}
+  draw(ctx) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 1920, 1080); }
+  destroy() { this.box.innerHTML = ''; }
+}
+
 const GAME_CLASSES = { snake: SnakeGame, breakout: BreakoutGame, asteroids: AsteroidGame, pong: PongGame };
 
 /* ================= OYUN ÇALIŞTIRICI ================= */
@@ -518,7 +561,8 @@ const Games = {
   isRunning(id) { return !!(this.current && this.current.id === id); },
 
   launch(id) {
-    if (APPS[id].web) { this.openWeb(id); return; }
+    // Tarayıcı sürümünde gömme mümkün değil: yeni sekmede aç
+    if (APPS[id].web && !window.desktop) { this.openWebTab(id); return; }
     if (this.isRunning(id)) { this.show(); Sound.select(); return; }
     if (this.current) {
       const name = APPS[this.current.id].name;
@@ -538,7 +582,7 @@ const Games = {
       held: a => Input.held(a),
       best: () => Save.data.highscores[id] || 0
     };
-    this.current = { id, game: new GAME_CLASSES[id](sys) };
+    this.current = { id, game: APPS[id].web ? new WebApp(id) : new GAME_CLASSES[id](sys) };
     Save.data.lastPlayed[id] = Date.now();
     Save.save();
     this.state = 'splash'; this.splashT = 2.2;
@@ -547,37 +591,48 @@ const Games = {
     Sound.launch();
     if (window.Home) Home.refresh();
   },
-  openWeb(id) {
+  openWebTab(id) {
     const app = APPS[id];
     Save.data.lastPlayed[id] = Date.now();
     Save.save();
     Sound.launch();
-    if (window.desktop && window.desktop.openWebApp) window.desktop.openWebApp(id);
-    else window.open(app.web, '_blank', 'noopener');
-    UI.toast({ iconHTML: coverSVG(app, { noTitle: true }), title: app.name, text: 'Ayrı bir pencerede açılıyor…' });
+    window.open(app.web, '_blank', 'noopener');
+    UI.toast({ iconHTML: coverSVG(app, { noTitle: true }), title: app.name, text: 'Yeni sekmede açılıyor…' });
     if (window.Home) Home.refresh();
+  },
+  isWeb() { return !!(this.current && this.current.game.web); },
+  // Gömülü oyun katmanını yalnızca oyun oynanırken göster
+  syncWeb() {
+    const on = this.isWeb() && this.visible && this.state === 'playing';
+    $('#web-layer').classList.toggle('on', on);
+    if (on) this.current.game.focus();
+    else if (document.activeElement && document.activeElement.tagName === 'WEBVIEW') document.activeElement.blur();
   },
   show() {
     this.visible = true;
     this.layer.classList.remove('hidden');
     requestAnimationFrame(() => requestAnimationFrame(() => this.layer.classList.add('in')));
     Sys.musicUpdate();
+    this.syncWeb();
   },
   hide() {
     this.visible = false;
     this.layer.classList.remove('in');
     setTimeout(() => { if (!this.visible) this.layer.classList.add('hidden'); }, 320);
     Sys.musicUpdate();
+    this.syncWeb();
   },
   suspend(silent) {
     if (!this.current) return;
-    if (this.state === 'playing') { this.state = 'paused'; this.menuSel = 0; this.renderOverlay(); }
+    // Çevrimiçi oyun duraklatılamaz; arkada çalışmaya devam eder
+    if (this.state === 'playing' && !this.isWeb()) { this.state = 'paused'; this.menuSel = 0; this.renderOverlay(); }
     this.hide();
     if (!silent) Sound.back();
-    if (window.Home) Home.refresh();
+    if (window.Home) { Home.refresh(); Home.select(this.current.id); }
   },
   close() {
     if (!this.current) return;
+    if (this.current.game.destroy) this.current.game.destroy();
     this.current = null;
     this.state = 'none';
     this.ov.innerHTML = '';
@@ -609,7 +664,7 @@ const Games = {
         `<div class="g-splash-name">${esc(app.name)}</div><div class="g-splash-ctrl">${esc(app.controls)}</div>` +
         `<div class="spinner"></div></div>`;
     } else if (this.state === 'playing') {
-      this.ov.innerHTML = `<div class="g-hint">${glyph('options')} Duraklat &nbsp;&nbsp; ${glyph('ps')} (H) Ana Ekran</div>`;
+      this.ov.innerHTML = this.isWeb() ? '' : `<div class="g-hint">${glyph('options')} Duraklat &nbsp;&nbsp; ${glyph('ps')} (H) Ana Ekran</div>`;
     } else {
       const opts = this.menuOptions();
       const head = this.state === 'paused'
@@ -619,6 +674,7 @@ const Games = {
         `<div class="opt ${i === this.menuSel ? 'sel' : ''}">${esc(o[0])}</div>`).join('')}</div>` +
         `<div class="hints">${hintsHTML([['x', 'Seç'], ['o', this.state === 'paused' ? 'Devam' : 'Geri']])}</div></div>`;
     }
+    this.syncWeb();
   },
   input(a) {
     if (!this.current) return;
@@ -626,7 +682,7 @@ const Games = {
     if (a === 'quick') { Sys.quickMenu(); return; }
     if (this.state === 'splash') return;
     if (this.state === 'playing') {
-      if (a === 'options') { this.state = 'paused'; this.menuSel = 0; this.renderOverlay(); Sound.select(); return; }
+      if (a === 'options' && !this.isWeb()) { this.state = 'paused'; this.menuSel = 0; this.renderOverlay(); Sound.select(); return; }
       if (this.current.game.input) this.current.game.input(a);
       return;
     }
