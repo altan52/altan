@@ -235,7 +235,7 @@ function showGameInfo(id) {
   UI.dialog({
     title: app.name,
     text: `${app.desc}\n\nYayıncı: ${app.publisher}\nTür: ${app.genre}\nBoyut: ${app.size}\nKontroller: ${app.controls}\n` +
-      (app.web ? `Adres: ${app.web}` : `En yüksek skor: ${Save.data.highscores[id] || 0}\nKupalar: ${p.got}/${p.total} (%${p.pct})`),
+      `En yüksek skor: ${Save.data.highscores[id] || 0}\nKupalar: ${p.got}/${p.total} (%${p.pct})`,
     options: [{ label: 'Kapat' }]
   });
 }

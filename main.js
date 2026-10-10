@@ -1,18 +1,8 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 
 const startFullscreen = process.argv.includes('--fullscreen');
-
-// Emülatörün içine gömülebilecek çevrimiçi oyunlar (yalnızca bu alan adları)
-function isAllowedWebUrl(u) {
-  try {
-    const url = new URL(u);
-    return url.protocol === 'https:' && /(^|\.)transformice\.com$/i.test(url.hostname);
-  } catch (e) {
-    return false;
-  }
-}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -32,7 +22,6 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       autoplayPolicy: 'no-user-gesture-required',
-      webviewTag: true,
       backgroundThrottling: false
     }
   });
@@ -47,10 +36,6 @@ function createWindow() {
     if (input.key === 'F11') {
       win.setFullScreen(!win.isFullScreen());
       event.preventDefault();
-    } else if (input.key === 'Home') {
-      // PS tuşu: gömülü oyun klavyeyi tutsa bile her zaman ana ekrana döner
-      event.preventDefault();
-      win.webContents.send('webapp:home');
     } else if (input.key === 'F12') {
       win.webContents.toggleDevTools();
       event.preventDefault();
@@ -59,33 +44,6 @@ function createWindow() {
 
   // Uygulama içinden dış bağlantı açılmasını engelle
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-
-  // Gömülü oyun görünümü: güvenli ayarlar ve izinli adres kontrolü
-  win.webContents.on('will-attach-webview', (event, webPreferences, params) => {
-    delete webPreferences.preload;
-    webPreferences.nodeIntegration = false;
-    webPreferences.contextIsolation = true;
-    webPreferences.sandbox = true;
-    if (!isAllowedWebUrl(params.src)) event.preventDefault();
-  });
-  win.webContents.on('did-attach-webview', (event, guest) => {
-    // Oyundaki açılır bağlantılar (forum, wiki vb.) varsayılan tarayıcıda açılsın
-    guest.setWindowOpenHandler(({ url }) => {
-      if (/^https?:\/\//i.test(url)) shell.openExternal(url);
-      return { action: 'deny' };
-    });
-    // Oyun klavyeyi tutarken Home = PS tuşu (ana ekrana dön), F11 = tam ekran
-    guest.on('before-input-event', (e, input) => {
-      if (input.type !== 'keyDown') return;
-      if (input.key === 'Home') {
-        e.preventDefault();
-        win.webContents.send('webapp:home');
-      } else if (input.key === 'F11') {
-        e.preventDefault();
-        win.setFullScreen(!win.isFullScreen());
-      }
-    });
-  });
 }
 
 ipcMain.on('app:quit', () => app.quit());

@@ -318,7 +318,6 @@ window.addEventListener('DOMContentLoaded', () => {
     UI.toast({ iconHTML: icon('gamepad'), title: on ? 'Kablosuz kumanda bağlandı' : 'Kumandanın bağlantısı kesildi' });
     if (window.Home) Home.refresh();
   };
-  if (window.desktop && window.desktop.onHomeKey) window.desktop.onHomeKey(() => route('ps', false));
   setInterval(updateClocks, 1000);
 
   // Fare imlecini hareketsizken gizle

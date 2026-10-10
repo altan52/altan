@@ -28,13 +28,19 @@ const APPS = {
       { id: 'plat', name: 'Yıkım Ustası', desc: 'Blok Kırıcı\'daki tüm kupaları kazan.', grade: 'platinum' }
     ]
   },
-  transformice: {
-    id: 'transformice', name: 'Transformice', publisher: 'Atelier 801', genre: 'Çok Oyunculu Platform', size: 'Çevrimiçi',
+  mice: {
+    id: 'mice', name: 'Peynir Avcıları', publisher: 'Altan Studios', genre: 'Platform · Parti', size: '1,8 GB',
     colors: ['#8fd3ff', '#2a5aa8'], glyph: 'mouse', preinstalled: true,
-    web: 'https://www.transformice.com/',
-    desc: 'Fare ol, peyniri kap ve yuvaya ilk sen ulaş! Şaman fareler köprüler kurarken diğer oyuncularla birlikte haritaları geç. Gerçek çevrimiçi oyun, emülatörün içinde açılır.',
-    controls: 'Oyunun kendi kontrolleri (klavye ve fare)  ·  Home: Ana ekran  ·  İnternet gerekir',
-    trophies: []
+    desc: 'Transformice tarzı fare yarışı: peyniri kap, yuvaya ilk sen gir! 8 farklı haritada 6 fareye karşı yarış. Şaman olduğun turlarda tahta, kutu ve trambolin yerleştirip diğer farelerin geçmesine yardım et.',
+    controls: 'Sol/Sağ: Koş  ·  ✕ / Yukarı: Zıpla  ·  Şamanken: Yön tuşları imleç, ✕ yerleştir, △ (T) eşya değiştir',
+    trophies: [
+      { id: 'cheese', name: 'Peynir Kokusu', desc: 'İlk kez peynir kap.', grade: 'bronze' },
+      { id: 'hole', name: 'Yuvaya Dönüş', desc: 'Peynirle birlikte yuvaya gir.', grade: 'bronze' },
+      { id: 'first', name: 'En Hızlı Fare', desc: 'Bir turda yuvaya ilk sen gir.', grade: 'silver' },
+      { id: 'shaman', name: 'Kurtarıcı Şaman', desc: 'Şamanken bir turda en az 4 fare kurtar.', grade: 'silver' },
+      { id: 'champ', name: 'Peynir Kralı', desc: '8 turluk bir oyunu birinci bitir.', grade: 'gold' },
+      { id: 'plat', name: 'Efsanevi Fare', desc: 'Peynir Avcıları\'ndaki tüm kupaları kazan.', grade: 'platinum' }
+    ]
   },
   asteroids: {
     id: 'asteroids', name: 'Asteroid Kaçışı', publisher: 'Nova Interactive', genre: 'Hayatta Kalma', size: '3,1 GB',

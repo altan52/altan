@@ -49,7 +49,7 @@ Windows kurulumu masaüstüne ve Başlat menüsüne **"PS4 Emulator"** kısayolu
 | △ | T | △ / Y |
 | □ | F | □ / X |
 | OPTIONS | M | Options / Menu |
-| PS (Ana ekran) | H / Home (Transformice içindeyken: Home) | PS tuşu |
+| PS (Ana ekran) | H / Home | PS tuşu |
 | Hızlı menü | Q | PS tuşuna basılı tut / Share |
 | Tam ekran | F11 | – |
 
@@ -61,8 +61,8 @@ Windows kurulumu masaüstüne ve Başlat menüsüne **"PS4 Emulator"** kısayolu
 - **Dinamik arka plan:** PS4'ün klasik dalgaları ve süzülen ışık parçacıkları (canvas ile gerçek zamanlı)
 - **Ortam müziği ve menü sesleri:** tamamı Web Audio API ile anında sentezlenir, ses dosyası yoktur
 - **Oyun askıya alma:** oyundayken PS tuşu (H) ana ekrana döner, oyun arkada bekler; tekrar seçince kaldığı yerden devam eder
-- **4 oynanabilir mini oyun:** Neon Yılan, Blok Kırıcı (yüklü gelir), Asteroid Kaçışı ve Retro Pong (Mağazadan indirilir)
-- **Transformice:** kütüphanede hazır gelir; gerçek çevrimiçi oyun (transformice.com) **emülatörün içinde** açılır. Oyundayken **Home** tuşu (kumandada PS) ana ekrana döner, oyun arkada bağlı kalır; tekrar seçince kaldığı yerden devam eder. Girişiniz hatırlanır. İnternet gerekir; tarayıcı sürümünde gömme mümkün olmadığından yeni sekmede açılır
+- **5 oynanabilir oyun:** Peynir Avcıları, Neon Yılan, Blok Kırıcı (yüklü gelir), Asteroid Kaçışı ve Retro Pong (Mağazadan indirilir)
+- **Peynir Avcıları (Transformice tarzı):** sıfırdan yazılmış, internetsiz çalışan fare yarışı. Peyniri kap, yuvaya ilk sen gir! 8 harita, 6 yapay zekâlı rakip fare, puan tablosu. Bazı turlarda **şaman** olursun: imleçle tahta, kutu ve trambolin yerleştirip diğer farelerin boşlukları ve duvarları geçmesine yardım edersin
 - **Kupa sistemi:** bronz/gümüş/altın/platin kupalar, kupa kazanma bildirimi, profil seviyesi
 - **Mağaza:** indirme ilerleme çubuğu, indirilen oyun ana ekrana eklenir; ek temalar (Gün Batımı, Derin Uzay)
 - **Ayarlar:** tema, müzik, ses efektleri, saat biçimi, tam ekran, kontroller, sistem bilgisi, sıfırlama
@@ -83,6 +83,7 @@ src/js/input.js        Klavye + Gamepad API
 src/js/ui.js           Diyaloglar, bildirimler, ekran yöneticisi
 src/js/home.js         Açılış, ana ekran ve tüm alt ekranlar
 src/js/games.js        Mini oyunlar ve oyun çalıştırıcı
+src/js/mice.js         Peynir Avcıları (fare yarışı, yapay zekâ, şaman modu)
 src/js/app.js          Arka plan, sistem (güç/kupa/bildirim), başlatma
 ```
 
