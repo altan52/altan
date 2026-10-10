@@ -62,6 +62,7 @@ Windows kurulumu masaüstüne ve Başlat menüsüne **"PS4 Emulator"** kısayolu
 - **Ortam müziği ve menü sesleri:** tamamı Web Audio API ile anında sentezlenir, ses dosyası yoktur
 - **Oyun askıya alma:** oyundayken PS tuşu (H) ana ekrana döner, oyun arkada bekler; tekrar seçince kaldığı yerden devam eder
 - **4 oynanabilir mini oyun:** Neon Yılan, Blok Kırıcı (yüklü gelir), Asteroid Kaçışı ve Retro Pong (Mağazadan indirilir)
+- **Transformice:** kütüphanede hazır gelir; "Başlat" ile gerçek çevrimiçi oyun (transformice.com) ayrı bir pencerede açılır, girişiniz hatırlanır (internet gerekir; tarayıcı sürümünde yeni sekmede açılır)
 - **Kupa sistemi:** bronz/gümüş/altın/platin kupalar, kupa kazanma bildirimi, profil seviyesi
 - **Mağaza:** indirme ilerleme çubuğu, indirilen oyun ana ekrana eklenir; ek temalar (Gün Batımı, Derin Uzay)
 - **Ayarlar:** tema, müzik, ses efektleri, saat biçimi, tam ekran, kontroller, sistem bilgisi, sıfırlama

@@ -518,6 +518,7 @@ const Games = {
   isRunning(id) { return !!(this.current && this.current.id === id); },
 
   launch(id) {
+    if (APPS[id].web) { this.openWeb(id); return; }
     if (this.isRunning(id)) { this.show(); Sound.select(); return; }
     if (this.current) {
       const name = APPS[this.current.id].name;
@@ -544,6 +545,16 @@ const Games = {
     this.renderOverlay();
     this.show();
     Sound.launch();
+    if (window.Home) Home.refresh();
+  },
+  openWeb(id) {
+    const app = APPS[id];
+    Save.data.lastPlayed[id] = Date.now();
+    Save.save();
+    Sound.launch();
+    if (window.desktop && window.desktop.openWebApp) window.desktop.openWebApp(id);
+    else window.open(app.web, '_blank', 'noopener');
+    UI.toast({ iconHTML: coverSVG(app, { noTitle: true }), title: app.name, text: 'Ayrı bir pencerede açılıyor…' });
     if (window.Home) Home.refresh();
   },
   show() {

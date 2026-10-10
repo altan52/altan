@@ -28,6 +28,14 @@ const APPS = {
       { id: 'plat', name: 'Yıkım Ustası', desc: 'Blok Kırıcı\'daki tüm kupaları kazan.', grade: 'platinum' }
     ]
   },
+  transformice: {
+    id: 'transformice', name: 'Transformice', publisher: 'Atelier 801', genre: 'Çok Oyunculu Platform', size: 'Çevrimiçi',
+    colors: ['#8fd3ff', '#2a5aa8'], glyph: 'mouse', preinstalled: true,
+    web: 'https://www.transformice.com/',
+    desc: 'Fare ol, peyniri kap ve yuvaya ilk sen ulaş! Şaman fareler köprüler kurarken diğer oyuncularla birlikte haritaları geç. Gerçek çevrimiçi oyun, ayrı bir pencerede açılır.',
+    controls: 'Oyunun kendi kontrolleri (klavye ve fare). İnternet bağlantısı gerekir.',
+    trophies: []
+  },
   asteroids: {
     id: 'asteroids', name: 'Asteroid Kaçışı', publisher: 'Nova Interactive', genre: 'Hayatta Kalma', size: '3,1 GB',
     colors: ['#f7971e', '#2e1065'], glyph: 'asteroids', store: true, price: 'Ücretsiz',
@@ -116,6 +124,7 @@ const Save = {
       highscores: {},
       lastPlayed: {},
       msgRead: [],
+      knownApps: Object.keys(APPS),
       notifications: [
         { type: 'info', title: 'Hoş geldiniz!', text: 'PS4 Arayüz Emülatörü kullanıma hazır.', time: Date.now(), read: false }
       ]
@@ -129,6 +138,16 @@ const Save = {
     this.data.settings = Object.assign(this.defaults().settings, this.data.settings || {});
     this.data.user = Object.assign(this.defaults().user, this.data.user || {});
     this.data.installed = this.data.installed.filter(id => APPS[id]);
+    // Güncellemeyle gelen yeni hazır uygulamaları eski kayıtlara da ekle
+    // (knownApps alanı olmayan kayıtlar 1.0.0 sürümündendir)
+    if (raw && !raw.knownApps) this.data.knownApps = ['snake', 'breakout', 'asteroids', 'pong'];
+    const known = this.data.knownApps;
+    for (const id of Object.keys(APPS)) {
+      if (known.includes(id)) continue;
+      if (APPS[id].preinstalled && !this.data.installed.includes(id)) this.data.installed.push(id);
+      known.push(id);
+    }
+    this.data.knownApps = known;
     if (!THEMES[this.data.settings.theme]) this.data.settings.theme = 'blue';
   },
   save() {
@@ -144,6 +163,7 @@ const Trophies = {
   earned(app, id) { return !!(Save.data.trophies[app] || {})[id]; },
   progress(app) {
     const list = APPS[app].trophies;
+    if (!list.length) return { got: 0, total: 0, pct: 0 };
     const got = list.filter(t => this.earned(app, t.id)).length;
     return { got, total: list.length, pct: Math.round(got / list.length * 100) };
   },

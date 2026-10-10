@@ -1,8 +1,56 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
 const path = require('path');
 
 const startFullscreen = process.argv.includes('--fullscreen');
+
+// Kütüphanedeki çevrimiçi oyunlar: yalnızca bu adresler açılabilir
+const WEB_APPS = {
+  transformice: { title: 'Transformice', url: 'https://www.transformice.com/' }
+};
+const webWindows = {};
+
+function openWebApp(id) {
+  const entry = WEB_APPS[id];
+  if (!entry) return;
+  const existing = webWindows[id];
+  if (existing && !existing.isDestroyed()) {
+    if (existing.isMinimized()) existing.restore();
+    existing.focus();
+    return;
+  }
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    minWidth: 800,
+    minHeight: 500,
+    title: entry.title,
+    backgroundColor: '#000000',
+    icon: path.join(__dirname, 'build', 'icon.png'),
+    autoHideMenuBar: true,
+    webPreferences: {
+      partition: 'persist:' + id, // oturum (giriş bilgisi) kalıcı olsun
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true
+    }
+  });
+  win.setMenu(null);
+  win.loadURL(entry.url);
+  // Açılır pencereleri (forum, wiki vb.) varsayılan tarayıcıda aç
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.type === 'keyDown' && input.key === 'F11') {
+      win.setFullScreen(!win.isFullScreen());
+      event.preventDefault();
+    }
+  });
+  win.on('closed', () => { delete webWindows[id]; });
+  webWindows[id] = win;
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -47,6 +95,7 @@ function createWindow() {
 }
 
 ipcMain.on('app:quit', () => app.quit());
+ipcMain.on('app:open-web', (e, id) => openWebApp(String(id)));
 ipcMain.on('app:fullscreen', (e) => {
   const win = BrowserWindow.fromWebContents(e.sender);
   if (win) win.setFullScreen(!win.isFullScreen());

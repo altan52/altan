@@ -135,11 +135,9 @@ class HomeScreen extends Screen {
     switch (it.kind) {
       case 'game': {
         const run = Games.isRunning(it.id);
-        const arr = [
-          { label: run ? 'Devam Et' : 'Başlat', fn: () => Games.launch(it.id) },
-          { label: 'Kupalar', fn: () => Nav.push(gameTrophiesScreen(it.id)) },
-          { label: 'Bilgi', fn: () => showGameInfo(it.id) }
-        ];
+        const arr = [{ label: run ? 'Devam Et' : 'Başlat', fn: () => Games.launch(it.id) }];
+        if (it.app.trophies.length) arr.push({ label: 'Kupalar', fn: () => Nav.push(gameTrophiesScreen(it.id)) });
+        arr.push({ label: 'Bilgi', fn: () => showGameInfo(it.id) });
         if (run) arr.push({ label: 'Uygulamayı Kapat', fn: () => Games.close() });
         return arr;
       }
@@ -230,7 +228,7 @@ function showGameInfo(id) {
   UI.dialog({
     title: app.name,
     text: `${app.desc}\n\nYayıncı: ${app.publisher}\nTür: ${app.genre}\nBoyut: ${app.size}\nKontroller: ${app.controls}\n` +
-      `En yüksek skor: ${Save.data.highscores[id] || 0}\nKupalar: ${p.got}/${p.total} (%${p.pct})`,
+      (app.web ? `Adres: ${app.web}` : `En yüksek skor: ${Save.data.highscores[id] || 0}\nKupalar: ${p.got}/${p.total} (%${p.pct})`),
     options: [{ label: 'Kapat' }]
   });
 }
@@ -240,7 +238,7 @@ function gameOptions(id) {
   const opts = [];
   if (Games.isRunning(id)) opts.push({ label: 'Uygulamayı Kapat', icon: 'close', action: () => Games.close() });
   opts.push({ label: 'Bilgi', icon: 'info', action: () => showGameInfo(id) });
-  opts.push({ label: 'Kupalar', icon: 'trophy', action: () => Nav.push(gameTrophiesScreen(id)) });
+  if (app.trophies.length) opts.push({ label: 'Kupalar', icon: 'trophy', action: () => Nav.push(gameTrophiesScreen(id)) });
   if (app.store) {
     opts.push({
       label: 'Sil', icon: 'trash', action: () => UI.dialog({
@@ -406,7 +404,7 @@ function profileScreen() {
 function trophiesScreen() {
   return new ListScreen({
     title: 'Kupalar', icon: 'trophy',
-    build: () => Object.keys(APPS).filter(id => Save.data.installed.includes(id) || Save.data.trophies[id]).map(id => {
+    build: () => Object.keys(APPS).filter(id => APPS[id].trophies.length && (Save.data.installed.includes(id) || Save.data.trophies[id])).map(id => {
       const p = Trophies.progress(id);
       return { icon: coverSVG(APPS[id], { noTitle: true }), title: APPS[id].name, sub: `${p.got} / ${p.total} kupa`, right: `%${p.pct}`, id,
         onX: () => Nav.push(gameTrophiesScreen(id)) };

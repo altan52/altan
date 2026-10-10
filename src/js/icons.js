@@ -77,6 +77,16 @@ const GAME_GLYPHS = {
     '<path d="M58 14 l14 4 l8 12 l-3 14 l-12 7 l-13 -3 l-7 -12 l3 -14z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
     '<path d="M22 22 l7 2 l3 6 l-4 5 l-7 -1 l-3 -6z" fill="none" stroke="#ffd29a" stroke-width="2.2" stroke-linejoin="round"/>' +
     '<path d="M32 70 l8 -20 l8 20 l-8 -5z" fill="#fff"/><path d="M37 68 l3 9 l3 -9" fill="#ffb347"/>',
+  mouse:
+    '<path d="M60 70 L88 58 L88 74 Z" fill="#ffd23f"/><path d="M60 70 L88 58 L84 54 Z" fill="#ffe680"/>' +
+    '<circle cx="77" cy="66" r="2.2" fill="#e8a800"/><circle cx="84" cy="69" r="1.5" fill="#e8a800"/>' +
+    '<circle cx="29" cy="25" r="11" fill="#c9a27e"/><circle cx="29" cy="25" r="6" fill="#f2b8c6"/>' +
+    '<circle cx="61" cy="25" r="11" fill="#c9a27e"/><circle cx="61" cy="25" r="6" fill="#f2b8c6"/>' +
+    '<ellipse cx="45" cy="46" rx="22" ry="20" fill="#c9a27e"/>' +
+    '<circle cx="37" cy="42" r="3.6" fill="#1d2433"/><circle cx="53" cy="42" r="3.6" fill="#1d2433"/>' +
+    '<circle cx="38" cy="41" r="1.1" fill="#fff"/><circle cx="54" cy="41" r="1.1" fill="#fff"/>' +
+    '<ellipse cx="45" cy="52" rx="3.4" ry="2.6" fill="#ff7a9a"/>' +
+    '<path d="M33 54 h-10 M33 57 l-9 3 M57 54 h10 M57 57 l9 3" stroke="#5a4636" stroke-width="1" stroke-linecap="round"/>',
   pong:
     '<rect x="13" y="26" width="5" height="22" rx="1.5" fill="#fff"/><rect x="82" y="40" width="5" height="22" rx="1.5" fill="#fff"/>' +
     '<path d="M50 12 V74" stroke="#fff" stroke-width="1.6" stroke-dasharray="3.5 3.5" opacity=".55"/>' +
