@@ -1,0 +1,251 @@
+:root {
+  --accent: #2f8cff;
+  --font: "SST", "Segoe UI", "Helvetica Neue", Roboto, "Noto Sans", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #000; color: #fff;
+  font-family: var(--font);
+  user-select: none; -webkit-user-select: none;
+}
+body.hide-cursor, body.hide-cursor * { cursor: none !important; }
+.hidden { display: none !important; }
+svg { display: block; }
+.ic { width: 100%; height: 100%; }
+
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+#stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1920px; height: 1080px;
+  transform: translate(-50%, -50%) scale(var(--scale, .5));
+  transform-origin: center center;
+  overflow: hidden;
+}
+#screens { position: absolute; inset: 0; z-index: 1; }
+#game-layer { position: absolute; inset: 0; z-index: 5; background: #000; opacity: 0; transition: opacity .3s ease; }
+#game-layer.in { opacity: 1; }
+#game-canvas { width: 1920px; height: 1080px; display: block; }
+#game-overlay { position: absolute; inset: 0; }
+#overlays { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+#toasts { position: absolute; top: 44px; left: 60px; z-index: 20; display: flex; flex-direction: column; gap: 14px; pointer-events: none; }
+
+/* ---------- Ekranlar ---------- */
+.screen { position: absolute; inset: 0; opacity: 0; transform: scale(1.025); transition: opacity .35s ease, transform .35s ease; }
+.screen.in { opacity: 1; transform: none; }
+.screen.out { opacity: 0; transform: scale(.985); }
+.screen.covered { opacity: 0; transform: scale(.98); pointer-events: none; }
+
+/* ---------- Tuş ipuçları ---------- */
+.hints { position: absolute; right: 90px; bottom: 46px; display: flex; gap: 40px; font-size: 25px; align-items: center; opacity: .92; }
+.hint { display: flex; align-items: center; gap: 12px; }
+.g { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,.35); border: 1.5px solid rgba(255,255,255,.45); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+.g svg { width: 30px; height: 30px; }
+.g-pill { display: inline-block; font-size: 15px; font-weight: 700; letter-spacing: 1px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,.55); background: rgba(0,0,0,.35); vertical-align: middle; }
+
+/* ---------- Açılış ---------- */
+.boot { background: #000; display: flex; align-items: center; justify-content: center; }
+.logo-wrap { text-align: center; opacity: 0; animation: logoIn 3.6s ease forwards; }
+.logo {
+  font-size: 230px; font-weight: 800; font-style: italic; letter-spacing: -10px;
+  background: linear-gradient(180deg, #ffffff 30%, #7fb0ff); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 40px rgba(70,140,255,.55));
+}
+.logo-sub { font-size: 26px; letter-spacing: 14px; opacity: .65; margin-top: 10px; }
+@keyframes logoIn {
+  0% { opacity: 0; transform: scale(.92); }
+  25% { opacity: 1; transform: scale(1); }
+  78% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.03); }
+}
+
+.press-start { display: flex; align-items: center; justify-content: center; }
+.ps-msg { text-align: center; }
+.ps-btn {
+  width: 120px; height: 120px; margin: 0 auto 40px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center;
+  font-size: 44px; font-weight: 800; font-style: italic; animation: breathe 2.2s ease-in-out infinite;
+}
+.ps-msg p { font-size: 42px; font-weight: 300; }
+.ps-msg small { display: block; margin-top: 20px; font-size: 24px; opacity: .6; }
+@keyframes breathe { 0%,100% { box-shadow: 0 0 10px rgba(255,255,255,.2); opacity: .7; } 50% { box-shadow: 0 0 50px rgba(120,180,255,.7); opacity: 1; } }
+
+.user-select { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.user-select h1 { font-size: 52px; font-weight: 300; margin-bottom: 80px; }
+.users { display: flex; gap: 60px; }
+.user { text-align: center; }
+.user .ua { width: 260px; height: 260px; border-radius: 6px; overflow: hidden; border: 4px solid transparent; transition: all .25s; }
+.user.sel .ua { border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,.35); transform: scale(1.06); }
+.user b { display: block; margin-top: 28px; font-size: 36px; font-weight: 400; }
+
+/* ---------- Ana ekran ---------- */
+.home .func-row { position: absolute; top: 120px; left: 180px; display: flex; gap: 44px; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+.func-item { position: relative; width: 64px; height: 64px; padding: 8px; border-radius: 6px; opacity: .72; color: #fff; transition: transform .25s, opacity .25s, background .25s, box-shadow .25s; }
+.home.zone-func .func-row { transform: translateY(40px); }
+.home.zone-func .func-item { opacity: .85; }
+.func-item.sel { opacity: 1 !important; transform: scale(1.4); background: rgba(255,255,255,.14); box-shadow: 0 0 0 1.5px rgba(255,255,255,.9), 0 0 24px rgba(255,255,255,.25); }
+.badge { position: absolute; top: -8px; right: -10px; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 13px; background: var(--accent); font-size: 16px; font-weight: 700; line-height: 26px; text-align: center; box-shadow: 0 0 10px rgba(0,0,0,.5); }
+.func-label { position: absolute; top: 265px; transform: translateX(-50%); font-size: 30px; opacity: 0; transition: opacity .25s, left .25s; white-space: nowrap; }
+.home.zone-func .func-label { opacity: 1; }
+
+.status { position: absolute; top: 42px; right: 90px; display: flex; align-items: center; gap: 18px; font-size: 30px; }
+.status .avatar { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,.6); }
+.status .clock { font-weight: 300; min-width: 90px; text-align: right; }
+.status .pad-ind { width: 40px; height: 40px; opacity: .85; }
+
+.content-row { position: absolute; left: 0; top: 300px; width: 100%; height: 340px; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+.home.zone-func .content-row { transform: translateY(170px); opacity: .45; }
+.home.zone-func .tile-title, .home.zone-func .tile-actions { opacity: 0; }
+.tile {
+  position: absolute; left: 0; top: 0; border-radius: 3px; overflow: hidden;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), width .32s cubic-bezier(.2,.8,.2,1), height .32s cubic-bezier(.2,.8,.2,1), opacity .3s, box-shadow .3s;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+}
+.tile svg { width: 100%; height: 100%; }
+.home.zone-content .tile.sel { box-shadow: 0 0 0 3px #fff, 0 0 40px rgba(255,255,255,.35), 0 20px 50px rgba(0,0,0,.5); }
+.home.zone-actions .tile.sel { box-shadow: 0 0 0 2px rgba(255,255,255,.4), 0 20px 50px rgba(0,0,0,.5); }
+.run-badge { position: absolute; left: 8px; bottom: 8px; width: 34px; height: 34px; padding: 7px; border-radius: 50%; background: rgba(0,0,0,.6); opacity: 0; transition: opacity .2s; }
+.tile.running .run-badge, .run-badge.on { opacity: 1; }
+.run-badge svg { fill: #fff; stroke: none; }
+
+.tile-title { position: absolute; left: 564px; top: 318px; transition: opacity .25s; max-width: 1200px; }
+.tile-title b { display: block; font-size: 44px; font-weight: 400; text-shadow: 0 2px 10px rgba(0,0,0,.4); }
+.tile-title span { display: block; font-size: 24px; opacity: .7; margin-top: 4px; }
+.tile-title.running span { opacity: 1; color: #9fd0ff; }
+
+.tile-actions { position: absolute; left: 180px; top: 690px; display: flex; gap: 18px; transition: opacity .25s, transform .3s; }
+.act { padding: 16px 44px; font-size: 26px; border-radius: 4px; background: rgba(255,255,255,.12); border: 2px solid transparent; transition: all .2s; }
+.act.primary { background: rgba(255,255,255,.22); }
+.act.sel { background: rgba(255,255,255,.95); color: #111; box-shadow: 0 0 24px rgba(255,255,255,.35); }
+.tile-desc { position: absolute; left: 180px; top: 790px; width: 1000px; font-size: 25px; line-height: 1.5; opacity: 0; transition: opacity .3s; }
+.home.zone-actions .tile-desc { opacity: .8; }
+
+/* ---------- Alt ekranlar ---------- */
+.sub { background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72)); }
+.sub-header { position: absolute; top: 64px; left: 120px; display: flex; align-items: center; gap: 24px; font-size: 46px; font-weight: 300; }
+.sub-header .ic { width: 58px; height: 58px; }
+.list { position: absolute; top: 190px; left: 120px; width: 1120px; height: 776px; overflow: hidden; }
+.list-inner { transition: transform .25s ease; padding: 4px; }
+.row { height: 100px; margin-bottom: 12px; display: flex; align-items: center; gap: 28px; padding: 0 30px; border-radius: 4px; background: rgba(255,255,255,.06); border: 2px solid transparent; transition: background .18s, border-color .18s, box-shadow .18s; }
+.row.sel { background: rgba(255,255,255,.17); border-color: rgba(255,255,255,.9); box-shadow: 0 0 26px rgba(255,255,255,.18); }
+.row .ri { width: 66px; height: 66px; flex: none; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.row .ri > svg { width: 100%; height: 100%; }
+.row .ri .ic { width: 46px; height: 46px; }
+.row .rt { flex: 1; min-width: 0; }
+.row .rt b { display: block; font-size: 30px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .rt span { display: block; font-size: 22px; opacity: .65; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .rr { font-size: 26px; display: flex; align-items: center; gap: 14px; opacity: .9; flex: none; }
+.row .rr em { font-style: normal; }
+.row .rr i { font-style: normal; font-size: 34px; opacity: 0; transition: opacity .2s; }
+.row.sel .rr i { opacity: .8; }
+.row.unread .rt b::after { content: ''; display: inline-block; width: 12px; height: 12px; margin-left: 14px; border-radius: 50%; background: var(--accent); vertical-align: middle; }
+.row.locked .rt b, .row.locked .rt span { opacity: .55; }
+.empty { font-size: 30px; opacity: .6; padding: 30px; }
+.fav { position: relative; width: 66px; height: 66px; }
+.fav svg { width: 100%; height: 100%; border-radius: 4px; }
+.fav .dot { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #1a1d24; }
+.dot.online { background: #3ddc84; } .dot.away { background: #ffb020; } .dot.offline { background: #6b7280; }
+
+.side { position: absolute; top: 190px; left: 1320px; width: 480px; font-size: 26px; line-height: 1.5; }
+.side > p { opacity: .75; }
+.side-card { background: rgba(255,255,255,.07); border-radius: 6px; padding: 40px; text-align: center; }
+.side-card h3 { font-size: 34px; font-weight: 400; margin: 18px 0 10px; }
+.side-card p { font-size: 22px; opacity: .75; }
+.side-card p.muted { margin-top: 14px; opacity: .55; }
+.side-av { width: 200px; height: 200px; margin: 0 auto; border-radius: 6px; overflow: hidden; }
+.side-av svg { width: 100%; height: 100%; }
+.side-trophy { width: 160px; height: 160px; margin: 0 auto; }
+.side-trophy svg { width: 100%; height: 100%; }
+.lvl { display: flex; flex-direction: column; align-items: center; gap: 12px; font-size: 26px; margin: 10px 0 20px; }
+.lvl span { display: inline-flex; align-items: center; gap: 10px; }
+.lvl .ic { width: 30px; height: 30px; }
+.bar { width: 100%; height: 10px; background: rgba(255,255,255,.15); border-radius: 5px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+.tcounts { display: flex; justify-content: center; gap: 22px; font-size: 26px; margin-bottom: 12px; }
+.tcounts span { display: flex; align-items: center; gap: 6px; }
+.tcounts svg { width: 34px; height: 34px; }
+
+/* Izgara */
+.grid { position: absolute; top: 190px; left: 120px; right: 120px; height: 620px; overflow: hidden; }
+.grid-inner { display: flex; flex-wrap: wrap; gap: 40px 36px; padding: 14px; transition: transform .25s ease; }
+.grid-screen .card { width: 300px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.07); border: 3px solid transparent; transition: transform .2s, border-color .2s, box-shadow .2s; }
+.card.sel { border-color: #fff; transform: scale(1.04); box-shadow: 0 0 30px rgba(255,255,255,.3); }
+.card .cover { position: relative; width: 100%; height: 300px; }
+.card .cover svg { width: 100%; height: 100%; }
+.card .info { padding: 14px 18px 18px; }
+.card .info b { display: block; font-size: 24px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .info span { display: block; font-size: 19px; opacity: .6; margin: 2px 0 8px; }
+.card .info small { display: flex; align-items: center; gap: 8px; font-size: 20px; }
+.card .info small .ic { width: 22px; height: 22px; }
+.card .info small.ok { color: #7ee2a8; }
+.prog { height: 8px; border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; margin: 6px 0 6px; }
+.prog i { display: block; height: 100%; background: var(--accent); transition: width .12s linear; }
+.grid-detail { position: absolute; left: 120px; top: 840px; width: 1200px; font-size: 24px; line-height: 1.5; }
+.grid-detail b { display: block; font-size: 32px; font-weight: 400; margin-bottom: 6px; }
+.grid-detail span { opacity: .75; }
+
+/* ---------- Diyaloglar ---------- */
+.dialog-backdrop { position: absolute; inset: 0; pointer-events: auto; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s ease; }
+.dialog-backdrop.show { opacity: 1; }
+.dialog { width: 920px; max-height: 960px; background: linear-gradient(180deg, #2b313d, #1a1e26); border: 1px solid rgba(255,255,255,.14); border-radius: 6px; padding: 50px 60px; box-shadow: 0 30px 90px rgba(0,0,0,.65); transform: scale(.96); transition: transform .2s ease; }
+.dialog-backdrop.show .dialog { transform: none; }
+.dialog h2 { font-size: 40px; font-weight: 400; margin-bottom: 22px; }
+.dialog p { font-size: 25px; line-height: 1.5; opacity: .82; white-space: pre-line; margin-bottom: 26px; }
+.opt { display: flex; align-items: center; gap: 20px; font-size: 28px; padding: 17px 28px; margin-top: 12px; border-radius: 4px; background: rgba(255,255,255,.07); border: 2px solid transparent; transition: all .15s; }
+.opt .ic { width: 34px; height: 34px; flex: none; }
+.opt.sel { background: rgba(255,255,255,.2); border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,.2); }
+.dialog-backdrop.quick { justify-content: flex-start; align-items: flex-end; background: rgba(0,0,0,.35); }
+.dialog-backdrop.quick .dialog { width: 640px; margin: 0 0 70px 70px; transform: translateY(30px); }
+.dialog-backdrop.quick.show .dialog { transform: none; }
+.dialog .txt { width: 100%; font: inherit; font-size: 32px; padding: 16px 20px; color: #fff; background: rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.4); border-radius: 4px; outline: none; margin-bottom: 20px; user-select: text; }
+.dialog .txt:focus { border-color: var(--accent); }
+table.ctrl { width: 100%; border-collapse: collapse; font-size: 24px; margin-bottom: 20px; }
+table.ctrl td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+table.ctrl td:first-child { width: 120px; }
+table.ctrl td:nth-child(2) { opacity: .7; width: 300px; }
+
+/* ---------- Bildirim baloncukları ---------- */
+.toast { width: 640px; display: flex; gap: 20px; align-items: center; padding: 18px 24px; background: rgba(22,26,34,.94); border-left: 6px solid var(--accent); border-radius: 4px; box-shadow: 0 14px 40px rgba(0,0,0,.5); transform: translateX(-130%); transition: transform .45s cubic-bezier(.2,.9,.2,1); }
+.toast.show { transform: none; }
+.toast .ti { width: 64px; height: 64px; flex: none; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.toast .ti > svg { width: 100%; height: 100%; }
+.toast .ti .ic { width: 44px; height: 44px; }
+.toast .tt { min-width: 0; }
+.toast b { display: block; font-size: 26px; font-weight: 500; }
+.toast span { display: block; font-size: 22px; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast.trophy { border-left-color: #ffcf3f; }
+
+/* ---------- Oyun katmanı ---------- */
+.g-splash { position: absolute; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: splashFade 2.2s ease forwards; }
+.g-splash-art { width: 380px; height: 380px; border-radius: 6px; overflow: hidden; box-shadow: 0 0 80px rgba(255,255,255,.15); animation: splashArt 2.2s ease forwards; }
+.g-splash-art svg { width: 100%; height: 100%; }
+.g-splash-name { font-size: 44px; font-weight: 300; margin-top: 40px; }
+.g-splash-ctrl { font-size: 24px; opacity: .6; margin-top: 12px; }
+.g-splash .spinner { position: absolute; right: 90px; bottom: 70px; }
+@keyframes splashFade { 0%, 82% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes splashArt { 0% { transform: scale(.9); opacity: 0; } 25% { transform: scale(1); opacity: 1; } }
+.spinner { width: 54px; height: 54px; border-radius: 50%; border: 4px solid rgba(255,255,255,.18); border-top-color: #fff; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.g-hint { position: absolute; right: 60px; bottom: 30px; font-size: 22px; opacity: 0; animation: hintFade 5s ease forwards; display: flex; align-items: center; gap: 10px; }
+@keyframes hintFade { 0% { opacity: 0; } 10%, 75% { opacity: .85; } 100% { opacity: 0; } }
+.g-menu { position: absolute; inset: 0; background: rgba(0,0,0,.66); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
+.g-menu h2 { font-size: 80px; font-weight: 700; letter-spacing: 4px; }
+.g-menu p { font-size: 30px; opacity: .8; margin: 10px 0 40px; }
+.g-menu .nb { color: #ffcf3f; }
+.g-opts { width: 600px; }
+.g-opts .opt { justify-content: center; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Dinlenme / Güç ---------- */
+#rest { position: fixed; inset: 0; z-index: 1000; background: #000; display: flex; align-items: center; justify-content: center; }
+#rest .rest-msg { font-size: 26px; text-align: center; opacity: 0; animation: restMsg 5s ease forwards; color: #ccc; }
+#rest .rest-msg small { font-size: 16px; opacity: .6; }
+@keyframes restMsg { 0% { opacity: 0; } 15%, 70% { opacity: .8; } 100% { opacity: 0; } }
+#rest .led { position: absolute; bottom: 40px; left: 50%; width: 140px; height: 4px; margin-left: -70px; border-radius: 2px; background: #ff8c1a; box-shadow: 0 0 20px #ff8c1a; animation: led 3s ease-in-out infinite; }
+@keyframes led { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
+#rest.power { animation: fadeIn .6s ease; }
+#rest .pw-msg { font-size: 28px; text-align: center; line-height: 1.6; color: #ddd; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+#rest .pw-msg small { font-size: 18px; opacity: .6; }
+#rest .pw-msg.dim { color: #888; }
